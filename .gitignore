@@ -1,0 +1,24 @@
+
+*.pyc
+*.pyd
+*.so
+*.zip
+*.tar.gz
+
+# Annotated test results
+models
+
+!requirements*.txt
+
+# egg-info
+*egg-info/
+
+#Other build stuff
+build/
+
+#pytest cache
+.cache/
+.DS*
+/.idea/
+saves/*
+.vscode/
