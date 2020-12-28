@@ -1,10 +1,11 @@
 import cv2
 import sys
-import numpy as np
-import datetime
 import os
 import glob
-from retinaface import RetinaFace
+
+import numpy as np
+
+from .retinaface import RetinaFace
 
 
 class FaceDetector(object):
@@ -59,14 +60,14 @@ class FaceDetector(object):
         if np.round(im_scale * im_size_max) > max_size:
             im_scale = float(max_size) / float(im_size_max)
 
-        print('im_scale', im_scale)
+        # print('im_scale', im_scale)
 
         scales = [im_scale]
         return scales
 
     def show_result(self, img, faces, landmarks):
         if faces is not None:
-            print('find', faces.shape[0], 'faces')
+            # print('find', faces.shape[0], 'faces')
             for i in range(faces.shape[0]):
                 box = faces[i]
                 color = (0, 0, 255)
@@ -81,6 +82,7 @@ class FaceDetector(object):
                             color = (0, 255, 0)
                         cv2.circle(img, (landmark5[l][0], landmark5[l][1]), 1,
                                    color, 2)
-        # filename = 'retinaface.jpg'
-        # cv2.imwrite(filename, img)
         return img
+
+if __name__ == '__main__':
+    image_path = 'images/friends'

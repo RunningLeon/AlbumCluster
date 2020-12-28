@@ -160,11 +160,7 @@ def expand_bbox(img_width: int,
     bbox[1] = np.maximum(bbox[1] - margin / 2, 0)
     bbox[2] = np.minimum(bbox[2] + margin / 2, img_width)
     bbox[3] = np.minimum(bbox[3] + margin / 2, img_height)
-    
-    landmarks_new = np.squeeze(landmarks)
-    landmarks_new[:, 0] -= bbox[0]
-    landmarks_new[:, 1] -= bbox[1]
-    return cropped, landmarks_new
+    return bbox
 
 
 def crop_image(image: np.ndarray, bbox: Sequence[int])->np.ndarray:

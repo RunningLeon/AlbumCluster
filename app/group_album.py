@@ -2,7 +2,7 @@ import os
 
 import cv2
 import numpy as np
-import tqdm
+from tqdm import tqdm
 
 from .align_face import align_face, crop_image, expand_bbox
 from .detect_face import FaceDetector
@@ -17,7 +17,7 @@ class FaceInfo(object):
         # core members
         self.bbox = bbox
         self.landmarks = landmarks
-        self.feature = None
+        self.feature = feature
         self.face_id = None
         self.image_path = None
         self.person_id = None
@@ -44,7 +44,8 @@ class GroupAlbum(object):
         self._cluster_algo = FaceClusteringAlgo()
         self._face_detector = FaceDetector(cfg.MODEL_RETINAFACE)
         self._face_extractor = FaceFeatureExtractor(cfg.MODEL_INSIGHTFACE)
-        self._mean_landmarks = np.load(cfg.LANDMARKS_MEAN_FILE)
+        # self._mean_landmarks = np.load(cfg.LANDMARKS_MEAN_FILE)
+        self._mean_landmarks = None
         self.process_data = {}
         self.save_dir = save_dir
         self.debug = debug
@@ -57,12 +58,14 @@ class GroupAlbum(object):
             drawn = image.copy()
         if bboxes is not None and landmarks is not None:
             for bbox, pts in zip(bboxes, landmarks):
-                face_info = FaceInfo(bbox, pts)
                 exp_bbox = expand_bbox(width, height, bbox)
                 cropped_face = crop_image(image, exp_bbox)
-                aligned_face = align_face(cropped_face, pts,
+                pts_in_face = pts.copy()
+                pts_in_face[:, 0] -= exp_bbox[0]
+                pts_in_face[:, 1] -= exp_bbox[1]
+                aligned_face = align_face(cropped_face, pts_in_face,
                                           self._mean_landmarks)
-                feature = self._face_extractor()
+                feature = self._face_extractor(aligned_face)
                 # update face_info
                 face_info = FaceInfo(bbox, pts, feature)
                 face_info.image_path = image_path
@@ -90,7 +93,8 @@ class GroupAlbum(object):
     def run(self, filename_li):
         counter = 0
         faceinfo_li = []
-        for i in tqdm(range(len(filename_li)), desc='Extracting feature: '):
+        pbar = tqdm(range(len(filename_li)), desc='Extracting feature: ')
+        for i in pbar:
             image_path = filename_li[i]
             _, filename = os.path.split(image_path)
             image_id, _ = os.path.splitext(filename)
@@ -109,7 +113,7 @@ class GroupAlbum(object):
         return self.process_data
 
     def save(self):
-        face_id_li = tqdm.tqdm(self.process_data.keys(), desc='Save image')
+        face_id_li = tqdm(self.process_data.keys(), desc='Save image')
         for face_id in face_id_li:
             face_info = self.process_data[face_id]
             person_id = face_info.person_id

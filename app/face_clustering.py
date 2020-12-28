@@ -6,7 +6,7 @@ from __future__ import print_function
 
 import os
 import numpy as np
-import tqdm
+from tqdm import tqdm
 
 import networkx
 from abc import ABCMeta, abstractmethod
@@ -42,7 +42,7 @@ class ChineseWhisperClustering(networkx.Graph):
         np.random.seed(seed)
         nrof_node = len(self.nodes)
 
-        for i in tqdm(range(nrof_iter), desc='Clustering feature: ')
+        for i in tqdm(range(nrof_iter), desc='Clustering feature: '):
             if node_li is None:
                 node_li = [
                     node for node in self.nodes()
@@ -128,10 +128,10 @@ class FaceClusteringAlgo(object):
     def process(self, faceinfo_li):
         nrof_face = len(faceinfo_li)
         print('Build graph ....')
-        feats = np.array([f.feature for f in faceinfo_li]).reshape(-1, self.emb_size)
+        feats = np.vstack([f.feature.reshape(-1, self.emb_size) for f in faceinfo_li])
         distances = cosine_distances(feats)
 
-        for i range(nrof_face):
+        for i in range(nrof_face):
             face_info = faceinfo_li[i]
             self._graph.add_node(i, face_id=face_info.face_id)
             for j in range(i, nrof_face):

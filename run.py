@@ -1,8 +1,9 @@
 import os
+import sys
 import glob
 import argparse
 
-from .app import GroupAlbum
+from app import GroupAlbum
 
 def main(args):
     assert os.path.exists(args.input), f'Directory not exists: {args.input}'

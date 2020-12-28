@@ -4,6 +4,7 @@
 *.so
 *.zip
 *.tar.gz
+*.c
 
 # Annotated test results
 models
