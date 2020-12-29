@@ -6,10 +6,10 @@
 *.tar.gz
 *.c
 
-# Annotated test results
-models
-
 !requirements*.txt
+
+# output directory
+output/
 
 # egg-info
 *egg-info/
