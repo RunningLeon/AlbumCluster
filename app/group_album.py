@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 from tqdm import tqdm
 
-from .align_face import align_face, crop_image, expand_bbox
+from .align_face import align_face, crop_image, expand_bbox, get_mean_landmarks
 from .detect_face import FaceDetector
 from .extract_feat import FaceFeatureExtractor
 from .face_clustering import FaceClusteringAlgo
@@ -33,9 +33,6 @@ class FaceInfo(object):
         self.face_id = _id
         return self.face_id
 
-    def show(self):
-        pass
-
 
 class GroupAlbum(object):
     def __init__(self, save_dir, debug=False):
@@ -44,8 +41,7 @@ class GroupAlbum(object):
         self._cluster_algo = FaceClusteringAlgo()
         self._face_detector = FaceDetector(cfg.MODEL_RETINAFACE)
         self._face_extractor = FaceFeatureExtractor(cfg.MODEL_INSIGHTFACE)
-        # self._mean_landmarks = np.load(cfg.LANDMARKS_MEAN_FILE)
-        self._mean_landmarks = None
+        self._mean_landmarks = get_mean_landmarks()
         self.process_data = {}
         self.save_dir = save_dir
         self.debug = debug
@@ -58,40 +54,50 @@ class GroupAlbum(object):
             drawn = image.copy()
         if bboxes is not None and landmarks is not None:
             for bbox, pts in zip(bboxes, landmarks):
+                # expand bbox and crop face from original image
                 exp_bbox = expand_bbox(width, height, bbox)
                 cropped_face = crop_image(image, exp_bbox)
+
+                # transform landmarks to crop face coordinate and align face
                 pts_in_face = pts.copy()
                 pts_in_face[:, 0] -= exp_bbox[0]
                 pts_in_face[:, 1] -= exp_bbox[1]
                 aligned_face = align_face(cropped_face, pts_in_face,
                                           self._mean_landmarks)
+
+                # extract face feature
                 feature = self._face_extractor(aligned_face)
+
                 # update face_info
                 face_info = FaceInfo(bbox, pts, feature)
                 face_info.image_path = image_path
                 face_id = face_info.create_id(image_id)
                 self.process_data[face_id] = face_info
+
                 if self.debug:
+                    cropped_face = draw_landmark(cropped_face, pts_in_face, draw_order=True)
                     face_info.expand_bbox = exp_bbox
                     face_info.align_face = aligned_face
                     face_info.crop_face = cropped_face
 
                     view_image(cropped_face,
                                name='cropped_face',
-                               wait_key=True)
+                               wait_key=False)
                     view_image(aligned_face,
                                name='aligned_face',
-                               wait_key=True)
+                               wait_key=False)
                     drawn = draw_bbox(drawn, bbox)
                     drawn = draw_landmark(drawn, pts)
 
                 faceinfo_li.append(face_info)
+
         if self.debug:
-            view_image(drawn, wait_key=True)
+            pass
+            view_image(drawn, wait_key=False)
+
         return faceinfo_li
 
     def run(self, filename_li):
-        counter = 0
         faceinfo_li = []
         pbar = tqdm(range(len(filename_li)), desc='Extracting feature: ')
         for i in pbar:
@@ -127,6 +133,10 @@ class GroupAlbum(object):
                 image = draw_bbox(image, face_info.bbox)
                 image = draw_landmark(image, face_info.landmarks)
                 cv2.imwrite(dst_image_path, image)
+                crop_face_path = os.path.join(person_dir, face_info.face_id + '_crop.png')
+                align_face_path = os.path.join(person_dir, face_info.face_id + '_align.png')
+                cv2.imwrite(crop_face_path, face_info.crop_face)
+                cv2.imwrite(align_face_path, face_info.align_face)
             else:
                 os.symlink(src_image_path, dst_image_path)
 

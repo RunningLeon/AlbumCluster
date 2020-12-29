@@ -11,6 +11,22 @@ import numpy as np
 from skimage import transform as trans
 
 
+def get_mean_landmarks():
+    # FIVE_MEAN_LANDMARKS = np.array(
+    #             [[30.2946, 51.6963],
+    #              [65.5318, 51.5014],
+    #              [48.0252, 71.7366],
+    #              [33.5493, 92.3655],
+    #              [62.7299, 92.2041]], dtype=np.float32)
+
+    FIVE_MEAN_LANDMARKS = np.array(
+                [[35.44186047, 48.76744186],
+                 [75.6744186,  48.74418605],
+                 [55.69767442, 64.93023256],
+                 [41.93023256, 86.60465116],
+                 [68.95348837, 86.44186047]], dtype=np.float32)
+    return FIVE_MEAN_LANDMARKS
+
 def calibrate_norm_landmark(landmarks: np.ndarray,
                             img_shape: tuple,
                             face_height=112,
@@ -43,7 +59,7 @@ def calibrate_norm_landmark(landmarks: np.ndarray,
 
 def align_face(face_img,
                landmarks,
-               mean_landmarks=None,
+               mean_landmarks,
                method=0,
                img_size=112):
     """align cropped face image with landmarks and reference landmarks.
@@ -51,7 +67,7 @@ def align_face(face_img,
     Args:
         face_img (np.ndarray): cropped face image
         landmarks (np.ndarray): [description]
-        mean_landmarks (np.ndarray, optional): [description]. Defaults to None.
+        mean_landmarks (np.ndarray): [description].
         method (int, optional): [description]. Defaults to 0.
         img_size (int, optional): [description]. Defaults to 112.
 
@@ -61,11 +77,6 @@ def align_face(face_img,
     Returns:
         [type]: [description]
     """
-    if mean_landmarks is None:
-        mean_landmarks = np.array(
-            [[30.2946, 51.6963], [65.5318, 51.5014], [48.0252, 71.7366],
-             [33.5493, 92.3655], [62.7299, 92.2041]],
-            dtype=np.float32)
     method_choices = (0, 1, 2)
     if method not in method_choices:
         raise ValueError('Input argument method(%s) must be in choices=%s ' %
@@ -176,3 +187,12 @@ def crop_image(image: np.ndarray, bbox: Sequence[int])->np.ndarray:
     """
     cropped = image[bbox[1]:bbox[3], bbox[0]:bbox[2], :]
     return cropped
+
+
+if __name__ == '__main__':
+    from app.view_util import draw_landmark, view_image
+
+    img = np.zeros((112, 112, 3)).astype(np.uint8)
+    landmarks = get_mean_landmarks()
+    img = draw_landmark(img, landmarks, draw_order=True)
+    view_image(img, name='Mean landmarks', wait_key=True)

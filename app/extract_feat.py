@@ -78,4 +78,4 @@ class FaceFeatureExtractor(object):
 
     def __call__(self, image):
         return self.predict(image)
-        
+
