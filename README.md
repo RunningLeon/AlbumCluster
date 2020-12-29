@@ -2,10 +2,10 @@
 
 ## Brief Introduction
 
-This repositiory contains a tool to cluster albums by face.
+This repository contains a tool to cluster albums by face.
 The main procedures are:
 
-- Input an ablum, which has photos of mutiple people.
+- Input an album, which has photos of multiple people.
 - Detect all face bounding boxes and five facial landmarks using [RetinaFace](https://github.com/deepinsight/insightface/tree/master/detection/RetinaFace).
 - Align all cropped face images using five facial landmarks.
 - Extract all 512-D face features using [insightface](https://github.com/deepinsight/insightface).
@@ -17,19 +17,24 @@ The main procedures are:
 
 ```bash
 git clone git@github.com:RunningLeon/AlbumCluster.git
+export ALBUM_HOME=$(pwd)/AlbumCluster
 ```
 
-### Create Enviroment
+### Create Environment
 
-Use conda to manage python environment.
+- create conda environment
+
+Suggest use `conda` to manage Python environment.
 
 ```bash
-conda create -n env python==3.8.0
+conda create -n env python==3.7.0
 source activate env
 pip install -r requirements.txt
 ```
 
-**mxnet**: Support 1.2~1.6
+- Install mxnet
+
+Support version: 1.2~1.6
 First confirm the cuda version on your system, than use `pip` to install.
 Example for cuda==10.2
 
@@ -37,20 +42,31 @@ Example for cuda==10.2
 pip install mxnet-cu102==1.4
 ```
 
-**Compile rcnn**:
+- Compile rcnn
 
 ```bash
-cd AlbumCluster/app/retinaface
+cd $ALBUM_HOME/AlbumCluster/app/retinaface
 make
+```
+
+- Download models
+Link: [Baidu YunPan](https://pan.baidu.com/s/1SQHu5fHB8SGB-7bJ0WmErQ)
+Code: `fsfl`
+
+Download `models.zip` and put it in `$AlbumCluster/models` directory.
+
+```bash
+cd $AlbumCluster/models
+unzip models.zip
 ```
 
 ### Run
 
 ```bash
-python run.py --input path_to_album --output path_to_result
+python run.py --input ./images --output ./output
 ```
 
-After a few minutes, results would be saved to `path_to_result`.
+After a few minutes, results would be saved to `output` directory.
 
 ## FAQs
 
@@ -58,4 +74,6 @@ After a few minutes, results would be saved to `path_to_result`.
 
 ## References
 
--
+- [RetinaFace](https://github.com/deepinsight/insightface/tree/master/detection/RetinaFace)
+- [insightface](https://github.com/deepinsight/insightface)
+- [Chinese Whispers](https://blog.csdn.net/u011808673/article/details/78644485/)
