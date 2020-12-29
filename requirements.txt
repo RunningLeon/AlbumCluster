@@ -1,0 +1,5 @@
+mxnet-cu102
+networkx
+tqdm
+numpy==1.18.5
+opencv-python==4.4.0.46

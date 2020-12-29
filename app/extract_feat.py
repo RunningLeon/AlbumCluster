@@ -7,7 +7,7 @@ import mxnet as mx
 import numpy as np
 from sklearn import preprocessing
 
-__all__ = 'FaceFeatureExtractor'
+__all__ = ['FaceFeatureExtractor']
 
 
 def get_model(image_size, model_str, layer, batch_size=1):
@@ -78,4 +78,25 @@ class FaceFeatureExtractor(object):
 
     def __call__(self, image):
         return self.predict(image)
+
+
+if __name__ == '__main__':
+    import os
+    import sys
+    np.set_printoptions(precision=4)
+    current_dir = os.path.dirname(__file__)
+    sys.path.append(os.path.join(current_dir, '.'))
+    sys.path.append(os.path.join(current_dir, '..'))
+
+    from app.model_config import cfg
+
+    face_path = os.path.join(current_dir, '../images/align_face.png')
+    assert os.path.exists(face_path), f'File not exists: {face_path}'
+    face_img = cv2.imread(face_path)
+    extractor = FaceFeatureExtractor(cfg.MODEL_INSIGHTFACE)
+    feature = extractor.predict(face_img)
+    print('Extracted face feature: ')
+    print(feature.shape, feature.dtype)
+    print(feature)
+
 

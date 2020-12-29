@@ -4,9 +4,14 @@ __all__ = ['cfg']
 
 
 class ModelCFG(object):
+    """
+    ModelCFG config file
+
+    Args:
+        object ([type]): [description]
+    """
     MODEL_RETINAFACE = 'models/retinaface-R50/R50,0'
     MODEL_INSIGHTFACE = 'models/model-r50-am-lfw/model,0'
-    ## LANDMARKS_MEAN_FILE = "models/mean_face_5pts_112x112.npy"
 
     def __init__(self):
         self.__dict__.update(self.__class__.__dict__)

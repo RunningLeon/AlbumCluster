@@ -13,7 +13,21 @@ from .view_util import draw_bbox, draw_landmark, view_image
 
 
 class FaceInfo(object):
+    """
+    FaceInfo class
+
+    Args:
+        object ([type]): [description]
+    """
     def __init__(self, bbox, landmarks, feature):
+        """
+        init
+
+        Args:
+            bbox ([type]): [description]
+            landmarks ([type]): [description]
+            feature ([type]): [description]
+        """
         # core members
         self.bbox = bbox
         self.landmarks = landmarks
@@ -35,7 +49,20 @@ class FaceInfo(object):
 
 
 class GroupAlbum(object):
+    """
+    GroupAlbum class
+
+    Args:
+        object ([type]): [description]
+    """
     def __init__(self, save_dir, debug=False):
+        """
+        init
+
+        Args:
+            save_dir ([type]): [description]
+            debug (bool, optional): [description]. Defaults to False.
+        """
         super(GroupAlbum, self).__init__()
 
         self._cluster_algo = FaceClusteringAlgo()
@@ -47,6 +74,17 @@ class GroupAlbum(object):
         self.debug = debug
 
     def _process(self, image: np.ndarray, image_id, image_path):
+        """
+        _process 
+
+        Args:
+            image (np.ndarray): [description]
+            image_id ([type]): [description]
+            image_path ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
         faceinfo_li = []
         height, width, _ = image.shape
         bboxes, landmarks = self._face_detector(image)
@@ -98,6 +136,15 @@ class GroupAlbum(object):
         return faceinfo_li
 
     def run(self, filename_li):
+        """
+        run 
+
+        Args:
+            filename_li ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
         faceinfo_li = []
         pbar = tqdm(range(len(filename_li)), desc='Extracting feature: ')
         for i in pbar:
@@ -118,7 +165,13 @@ class GroupAlbum(object):
 
         return self.process_data
 
+    def __call__(self, filename_li):
+        return self.run(filename_li)
+        
     def save(self):
+        """
+        save results
+        """
         face_id_li = tqdm(self.process_data.keys(), desc='Save image')
         for face_id in face_id_li:
             face_info = self.process_data[face_id]

@@ -12,6 +12,12 @@ from skimage import transform as trans
 
 
 def get_mean_landmarks():
+    """
+    get_mean_landmarks 
+
+    Returns:
+        np.ndarray: mean_landmarks
+    """
     # FIVE_MEAN_LANDMARKS = np.array(
     #             [[30.2946, 51.6963],
     #              [65.5318, 51.5014],
@@ -26,6 +32,7 @@ def get_mean_landmarks():
                  [41.93023256, 86.60465116],
                  [68.95348837, 86.44186047]], dtype=np.float32)
     return FIVE_MEAN_LANDMARKS
+
 
 def calibrate_norm_landmark(landmarks: np.ndarray,
                             img_shape: tuple,

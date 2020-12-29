@@ -4,45 +4,69 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import os
 import numpy as np
 from tqdm import tqdm
 
 import networkx
-from abc import ABCMeta, abstractmethod
 from collections import defaultdict
 from sklearn.metrics.pairwise import cosine_distances
 
+
 class ChineseWhisperClustering(networkx.Graph):
     """
-    继承networkx.Graph类, 主要实现动态聚类
+    ChineseWhisperClustering 继承networkx.Graph类, 主要实现动态聚类
     """
     def __init__(self, nrof_iter=20, **attrs_kw):
+        """
+        init
+
+        Args:
+            nrof_iter (int, optional): [description]. Defaults to 20.
+        """
         super(ChineseWhisperClustering, self).__init__(None, **attrs_kw)
         self.nrof_iter = nrof_iter
         self.__cluster_id_tag = '__cluster_id'
         self._id_tag = 'id'
+        self._stop_thresh = 0.05
 
     def add_node(self, node, **attrs_kw):
+        """
+        add_node 
+
+        Args:
+            node ([type]): [description]
+        """
         attrs_kw.update({self.__cluster_id_tag: node})
         super().add_node(node, **attrs_kw)
 
     def add_edge(self, u_node, v_node, weight):
+        """
+        add_edge 
+
+        Args:
+            u_node ([type]): [description]
+            v_node ([type]): [description]
+            weight ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
         return super().add_edge(u_node, v_node, weight=weight)
 
     def update_cluster(self, nrof_iter=None, node_li=None, seed=814):
         """
-        迭代更新节点类标签
-        :param nrof_iter:
-        :param node_li:
-        :return:
+        update_cluster 迭代更新节点类标签
+
+        Args:
+            nrof_iter ([type], optional): [description]. Defaults to None.
+            node_li ([type], optional): [description]. Defaults to None.
+            seed (int, optional): [description]. Defaults to 814.
         """
         nrof_iter = self.nrof_iter if nrof_iter is None else nrof_iter
-        update_nodes_info = {}
         np.random.seed(seed)
         nrof_node = len(self.nodes)
 
-        for i in tqdm(range(nrof_iter), desc='Clustering feature: '):
+        for _ in tqdm(range(nrof_iter), desc='Clustering feature: '):
             if node_li is None:
                 node_li = [
                     node for node in self.nodes()
@@ -63,6 +87,15 @@ class ChineseWhisperClustering(networkx.Graph):
                     st_cluster_weights = sorted(
                         cluster_weight_sum.items(), key=lambda x: x[1])
                     winning_group_id, edge_weight_sum = st_cluster_weights[-1]
+                    # update current node
+                    if winning_group_id != cur_cluster_id:
+                        self.nodes[cur_node][self.__cluster_id_tag] = winning_group_id
+                        counter += 1
+
+            thresh = 1 if counter == 0 else counter / float(nrof_node)
+            if thresh < self._stop_thresh:
+                print(f'Update number: {counter}/{nrof_node} ratio: {thresh} < {self._stop_thresh}')
+                break
 
     def _get_clusters(self):
         clusters_dic = defaultdict(list)
@@ -73,9 +106,14 @@ class ChineseWhisperClustering(networkx.Graph):
 
     def get_clusters(self, num_per_cluster=1, attr_li=None):
         """
-        获取聚类结果
-        :param attr_li:
-        :return:
+        get_clusters 获取聚类结果
+
+        Args:
+            num_per_cluster (int, optional): [description]. Defaults to 1.
+            attr_li ([type], optional): [description]. Defaults to None.
+
+        Returns:
+            [type]: [description]
         """
         clusters_dic = self._get_clusters()
         clusters_dic = {
@@ -89,6 +127,17 @@ class ChineseWhisperClustering(networkx.Graph):
         return clusters_dic
 
     def get_node_attrs(self, node_id, node_attr_li, add_id_tag=False):
+        """
+        get_node_attrs 
+
+        Args:
+            node_id ([type]): [description]
+            node_attr_li ([type]): [description]
+            add_id_tag (bool, optional): [description]. Defaults to False.
+
+        Returns:
+            [type]: [description]
+        """
         res = {}
         if add_id_tag:
             res[self._id_tag] = node_id
@@ -109,15 +158,16 @@ class ChineseWhisperClustering(networkx.Graph):
 
 class FaceClusteringAlgo(object):
     """
-    基于Chinese Whisper Clustering的动态人脸分堆算法
+    基于Chinese Whispers的动态人脸分堆算法
     """
 
     def __init__(self, threshold=0.45, nrof_iter=10, debug=False):
         """
         创建分堆算法对象
-        :param threshold: 人脸相似度阈值, 默认0.45
-        :param nrof_iter: 迭代次数, 默认为10
-        :param debug: 调试模式
+        Args:
+            threshold (float, optional): 人脸相似度阈值. Defaults to 0.45.
+            nrof_iter (int, optional): 迭代次数. Defaults to 10.
+            debug (bool, optional): debug. Defaults to False.
         """
         super(FaceClusteringAlgo, self).__init__()
         self._threshold = threshold
@@ -126,6 +176,15 @@ class FaceClusteringAlgo(object):
         self._graph = ChineseWhisperClustering(nrof_iter)
 
     def process(self, faceinfo_li):
+        """
+        process face info list
+
+        Args:
+            faceinfo_li ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
         nrof_face = len(faceinfo_li)
         print('Build graph ....')
         feats = np.vstack([f.feature.reshape(-1, self.emb_size) for f in faceinfo_li])
