@@ -1,5 +1,11 @@
-mxnet-cu102
+# gpu on cuda 10.2
+#mxnet-cu102
+# cpu
 networkx
 tqdm
-numpy==1.18.5
+cython
+numpy==1.19.4
+scikit-image==0.18.1
+scikit-learn==1.5.4
+mxnet==1.6.0
 opencv-python==4.4.0.46

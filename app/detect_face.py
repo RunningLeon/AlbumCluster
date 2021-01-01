@@ -3,30 +3,30 @@ import cv2
 import numpy as np
 
 from .retinaface import RetinaFace
+from .info import is_cuda_available
 
 
 class FaceDetector(object):
-    """RetinaFace detect face boxes and five facial landmarks.
-    """
+    """RetinaFace detect face boxes and five facial landmarks."""
 
-    def __init__(self, model_str, gpu_id=0):
-        """Init instance
+    def __init__(self, model_str):
+        """Init instance.
 
         Args:
             model_str ([type]): string of model checkpoint by `prefix,epoch`
-            gpu_id (int, optional): GPU id. Defaults to 0.
         """
         prefix, epoch = model_str.split(',')
         epoch = int(epoch)
         self.nms_threshold = 0.8
-        self._detector = RetinaFace(prefix, epoch, gpu_id, 'net3')
         self.scales = (1024, 1980)
+        ctx_id = 0 if is_cuda_available() else -1
+        self._detector = RetinaFace(prefix, epoch, ctx_id, 'net3')
 
     def predict(self, img: np.ndarray)->tuple:
-        """
-        predict
+        """predict.
 
         Args:
+            img (np.ndarray): [description]
             img (np.ndarray): [description]
 
         Returns:
@@ -62,7 +62,13 @@ class FaceDetector(object):
 
 if __name__ == '__main__':
     import os
-    image_path = 'images/friends.jpg'
+    import sys
+
+    current_dir = os.path.dirname(__file__)
+    sys.path.insert(0, current_dir)
+    sys.path.insert(0, os.path.join(current_dir, '..'))
+    
+    image_path = os.path.join(current_dir, '../images/friends.jpg')
     assert os.path.exists(image_path), f'File not exists: {image_path}'
     from app.model_config import cfg
     from app.view_util import view_image, draw_bbox, draw_landmark

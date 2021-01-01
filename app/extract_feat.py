@@ -7,12 +7,13 @@ import mxnet as mx
 import numpy as np
 from sklearn import preprocessing
 
+from .info import is_cuda_available
+
 __all__ = ['FaceFeatureExtractor']
 
 
 def get_model(image_size, model_str, layer, batch_size=1):
-    """Load model from checkpoint
-    """
+    """Load model from checkpoint."""
     _vec = model_str.split(',')
     assert len(_vec) == 2
     prefix = _vec[0]
@@ -20,7 +21,8 @@ def get_model(image_size, model_str, layer, batch_size=1):
     sym, arg_params, aux_params = mx.model.load_checkpoint(prefix, epoch)
     all_layers = sym.get_internals()
     sym = all_layers[layer + '_output']
-    model = mx.mod.Module(symbol=sym, context=mx.gpu(), label_names=None)
+    context = mx.gpu() if is_cuda_available() else mx.cpu()
+    model = mx.mod.Module(symbol=sym, context=context, label_names=None)
     model.bind(data_shapes=[('data', (batch_size, 3, image_size[0],
                                       image_size[1]))])
     model.set_params(arg_params, aux_params)
