@@ -22,9 +22,11 @@ export ALBUM_HOME=$(pwd)/AlbumCluster
 
 ### Create Environment
 
-- create conda environment
+Strongly suggest use `conda` to manage Python environment.
+If you do not have conda on your system, please goto download and install [miniconda](https://docs.conda.io/en/latest/miniconda.html)
 
-Suggest use `conda` to manage Python environment.
+- create conda environment
+Once `conda` is installed, please follow steps below to create the environment.
 
 ```bash
 conda create -n env python==3.7.0
@@ -32,14 +34,13 @@ source activate env
 pip install -r requirements.txt
 ```
 
-- Install mxnet
-
-Support version: 1.2~1.6
+- Install mxnet-gpu
+By defaults, there is mxnet-cpu in [requirements.txt](./requirements.txt). If you have cuda installed on your system, you can install mxnet-gpu. Supported version is from 1.2 to 1.6.
 First confirm the cuda version on your system, than use `pip` to install.
 Example for cuda==10.2
 
 ```bash
-pip install mxnet-cu102==1.4
+pip install mxnet-cu102==1.6.0
 ```
 
 - Compile rcnn
