@@ -13,7 +13,19 @@ __all__ = ['FaceFeatureExtractor']
 
 
 def get_model(image_size, model_str, layer, batch_size=1):
-    """Load model from checkpoint."""
+    """
+    get_model Load model from checkpoint
+
+    Args:
+        image_size ([type]): [description]
+        model_str ([type]): [description]
+        layer ([type]): [description]
+        batch_size (int, optional): [description]. Defaults to 1.
+
+    Returns:
+        [type]: [description]
+    """
+    
     _vec = model_str.split(',')
     assert len(_vec) == 2
     prefix = _vec[0]
@@ -30,6 +42,9 @@ def get_model(image_size, model_str, layer, batch_size=1):
 
 
 class FaceFeatureExtractor(object):
+    """
+    FaceFeatureExtractor 人脸识别特征提取模块
+    """
 
     def __init__(self, modelfile, batch_size=1):
         super(FaceFeatureExtractor, self).__init__()
@@ -43,12 +58,12 @@ class FaceFeatureExtractor(object):
         self.batch_size = batch_size
 
     @staticmethod
-    def get_input(face_img):
+    def _get_input(face_img):
         nimg = cv2.cvtColor(face_img, cv2.COLOR_BGR2RGB)
         aligned = np.transpose(nimg, (2, 0, 1))
         return aligned
 
-    def get_feature(self, aligned):
+    def _get_feature(self, aligned):
         input_blob = np.expand_dims(aligned, axis=0)
         data = mx.nd.array(input_blob)
         db = mx.io.DataBatch(data=(data, ))
@@ -57,25 +72,20 @@ class FaceFeatureExtractor(object):
         embedding = preprocessing.normalize(embedding).flatten()
         return embedding
 
-    def get_ga(self, aligned):
-        input_blob = np.expand_dims(aligned, axis=0)
-        data = mx.nd.array(input_blob)
-        db = mx.io.DataBatch(data=(data, ))
-        self.ga_model.forward(db, is_train=False)
-        ret = self.ga_model.get_outputs()[0].asnumpy()
-        g = ret[:, 0:2].flatten()
-        gender = np.argmax(g)
-        a = ret[:, 2:202].reshape((100, 2))
-        a = np.argmax(a, axis=1)
-        age = int(sum(a))
+    def predict(self, image: np.ndarray):
+        """
+        输入一张对齐后的人脸图片, 输出 512-D 人脸特征
 
-        return gender, age
+        Args:
+            image (np.ndarray): 输入人脸图片
 
-    def predict(self, image):
+        Returns:
+            np.ndarray: 512-D 人脸特征
+        """
         src_img = cv2.resize(
             image, self.image_size, interpolation=cv2.INTER_LINEAR)
-        img_processed = self.get_input(src_img)
-        feat = self.get_feature(img_processed)
+        img_processed = self._get_input(src_img)
+        feat = self._get_feature(img_processed)
         return feat
 
     def __call__(self, image):
