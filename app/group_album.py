@@ -4,7 +4,6 @@ from collections import defaultdict
 import cv2
 import numpy as np
 from tqdm import tqdm
-from imutils import build_montages
 
 from .align_face import align_face, crop_image, expand_bbox, get_mean_landmarks
 from .detect_face import FaceDetector
@@ -93,8 +92,6 @@ class GroupAlbum(object):
             for bbox, pts in zip(bboxes, landmarks):
                 # expand bbox and crop face from original image
                 exp_bbox = expand_bbox(width, height, bbox, margin=12)
-                ## TODO temp change to use default box
-                exp_bbox = bbox
                 cropped_face = crop_image(image, exp_bbox)
 
                 # transform landmarks to crop face coordinate and align face
