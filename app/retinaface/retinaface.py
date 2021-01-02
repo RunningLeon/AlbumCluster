@@ -189,7 +189,7 @@ class RetinaFace:
                 value['SCALES'] = tuple(scales)
                 self.anchor_cfg[key] = value
 
-        print(self._feat_stride_fpn, self.anchor_cfg)
+        # print(self._feat_stride_fpn, self.anchor_cfg)
 
         for s in self._feat_stride_fpn:
             self.fpn_keys.append('stride%s' % s)
@@ -220,15 +220,15 @@ class RetinaFace:
         self.pixel_means = np.array(pixel_means, dtype=np.float32)
         self.pixel_stds = np.array(pixel_stds, dtype=np.float32)
         self.pixel_scale = float(pixel_scale)
-        print('means', self.pixel_means)
+        # print('means', self.pixel_means)
         self.use_landmarks = False
         if len(sym) // len(self._feat_stride_fpn) >= 3:
             self.use_landmarks = True
-        print('use_landmarks', self.use_landmarks)
+        # print('use_landmarks', self.use_landmarks)
         self.cascade = 0
         if float(len(sym)) // len(self._feat_stride_fpn) > 3.0:
             self.cascade = 1
-        print('cascade', self.cascade)
+        # print('cascade', self.cascade)
         #self.bbox_stds = [0.1, 0.1, 0.2, 0.2]
         #self.landmark_std = 0.1
         self.bbox_stds = [1.0, 1.0, 1.0, 1.0]
@@ -238,7 +238,7 @@ class RetinaFace:
             c = len(sym) // len(self._feat_stride_fpn)
             sym = sym[(c * 0):]
             self._feat_stride_fpn = [32, 16, 8]
-        print('sym size:', len(sym))
+        # print('sym size:', len(sym))
 
         image_size = (640, 640)
         self.model = mx.mod.Module(symbol=sym,

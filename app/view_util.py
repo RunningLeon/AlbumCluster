@@ -8,8 +8,9 @@ from __future__ import print_function
 import sys
 import cv2
 import numpy as np
+from matplotlib import pyplot as plt
 
-__all__ = ['draw_bbox', 'draw_landmark', 'view_image']
+__all__ = ['draw_bbox', 'draw_landmark', 'view_image', 'plog_images']
 
 
 def draw_bbox(img_bgr, bbox, is_ratio=False, label='', color=(0, 255, 0), text_size=0.5):
@@ -115,3 +116,34 @@ def parse_key():
     elif key & 0xFF == ord('d'):
         good = False
     return good
+
+
+def plot_images(images, labels, nrof_col=6, title='', figsize=(12, 12), save_path='',  block=False):
+    """
+    plot_images [summary]
+
+    Args:
+        images ([type]): [description]
+        labels ([type]): [description]
+        nrof_col (int, optional): [description]. Defaults to 6.
+        title (str, optional): [description]. Defaults to ''.
+        figsize (tuple, optional): [description]. Defaults to (12, 12).
+        save_path (str, optional): [description]. Defaults to ''.
+        block (bool, optional): [description]. Defaults to False.
+    """
+    fig = plt.figure(figsize=figsize)
+    n = len(images)
+    nrof_row = n // nrof_col
+    if n % nrof_col:
+        nrof_row += 1
+    for i in range(n):
+        ax = plt.subplot(nrof_row, nrof_col, i+1)
+        ax.imshow(images[i])
+        ax.set_title(labels[i])
+        ax.axis('off')
+    if title:
+        plt.suptitle(title)
+    plt.tight_layout()
+    if save_path:
+        plt.savefig(save_path)
+    plt.show(block=block)

@@ -18,7 +18,8 @@ def main(args):
     worker = GroupAlbum(args.output, args.debug)
     worker.run(image_paths)
     worker.save()
-
+    if args.debug:
+        worker.show()
 
 def parse_arguments(argv):
     parser = argparse.ArgumentParser()
