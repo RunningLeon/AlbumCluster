@@ -132,14 +132,9 @@ class GroupAlbum(object):
 
                 faceinfo_li.append(face_info)
 
-        # # extract face feature by batch
-        # if aligned_face_li:
-        #     feat_li = self._face_extractor.predict(aligned_face_li)
-        #     for i in range(len(faceinfo_li)):
-        #         faceinfo_li[i].feature = feat_li[i]
         if self.debug:
-            pass
             # view_image(drawn, wait_key=False)
+            pass
 
         return faceinfo_li, aligned_face_li
 
