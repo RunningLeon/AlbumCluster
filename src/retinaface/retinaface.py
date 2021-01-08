@@ -11,13 +11,11 @@ import numpy as np
 import mxnet as mx
 from mxnet import ndarray as nd
 
-#from rcnn import config
-from .rcnn.logger import logger
-#from rcnn.processing.bbox_transform import nonlinear_pred, clip_boxes, landmark_pred
-from .rcnn.processing.bbox_transform import bbox_overlaps, clip_boxes
-from .rcnn.processing.generate_anchor import (anchors_plane,
+from rcnn.logger import logger
+from rcnn.processing.bbox_transform import bbox_overlaps, clip_boxes
+from rcnn.processing.generate_anchor import (anchors_plane,
                                               generate_anchors_fpn)
-from .rcnn.processing.nms import cpu_nms_wrapper, gpu_nms_wrapper
+from rcnn.processing.nms import cpu_nms_wrapper, gpu_nms_wrapper
 
 
 class RetinaFace:

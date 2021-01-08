@@ -3,6 +3,7 @@
 # cpu
 networkx
 tqdm
+easydict
 cython
 numpy==1.19.4
 scikit-image==0.18.1
