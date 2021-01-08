@@ -1,5 +1,5 @@
 # Album Clustering
-
+![avatar](images/pipeline.png)
 ## Brief Introduction
 
 This repository contains a tool to cluster albums by face.
@@ -69,6 +69,9 @@ python run.py --input ./images --output ./output
 
 After a few minutes, results would be saved to `output` directory.
 
+## Example Results
+
+![avatar](images/clusters.png)
 ## FAQs
 
 - None

@@ -252,3 +252,4 @@ class GroupAlbum(object):
                 image_matrix[row_start:(row_start+image_size), col_start:(col_start+image_size), :] \
                     = face_img
         view_image(image_matrix, name='face clustering', wait_key=True)
+        cv2.imwrite('clusters.png', image_matrix)

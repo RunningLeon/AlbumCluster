@@ -12,6 +12,25 @@ from collections import defaultdict
 from sklearn.metrics.pairwise import cosine_distances
 from sklearn.cluster import DBSCAN
 
+
+def cal_distance(embeddings1, embeddings2, distance_metric=1):
+    if distance_metric==0:
+        # Euclidian distance
+        diff = np.subtract(embeddings1, embeddings2)
+        dist = np.sum(np.square(diff),1)
+    elif distance_metric==1:
+        # Distance based on cosine similarity
+        dot = np.sum(np.multiply(embeddings1, embeddings2), axis=1)
+        norm = np.linalg.norm(embeddings1, axis=1) * np.linalg.norm(embeddings2, axis=1)
+        similarity = dot / norm
+        min_dist = np.min(similarity)
+        dist = 1 - similarity
+        # dist = np.arccos(similarity) / np.pi
+    else:
+        raise 'Undefined distance metric %d' % distance_metric
+    return dist
+
+
 class ChineseWhisperClustering(networkx.Graph):
     """
     ChineseWhisperClustering 继承networkx.Graph类, 主要实现无监督聚类
@@ -179,7 +198,7 @@ class FaceClusteringAlgo(object):
     基于Chinese Whispers的无监督聚类算法
     """
 
-    def __init__(self, threshold=0.7, nrof_iter=10, debug=False):
+    def __init__(self, threshold=0.65, nrof_iter=10, debug=False):
         """
         创建分堆算法对象
         Args:
@@ -206,13 +225,15 @@ class FaceClusteringAlgo(object):
         nrof_face = len(faceinfo_li)
         print('Build graph ....')
         feats = np.vstack([f.feature.reshape(-1, self.emb_size) for f in faceinfo_li])
-        distances = cosine_distances(feats)
+        # distances = cosine_distances(feats)
+
 
         for i in range(nrof_face):
             face_info = faceinfo_li[i]
             self._graph.add_node(i, face_id=face_info.face_id)
             for j in range(i+1, nrof_face):
-                weight = distances[i][j]
+                # weight = distances[i][j]
+                weight = cal_distance(feats[i].reshape(1, -1), feats[j].reshape(1, -1))[0]
                 # print(f'({i}, {j})={weight}')
                 if weight <= self._threshold:
                     self._graph.add_edge(i, j, weight)
