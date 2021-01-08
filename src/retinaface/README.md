@@ -1,20 +1,10 @@
 # RetinaFace Face Detector
 
-## Introduction
-
-RetinaFace is a practical single-stage [SOTA](http://shuoyang1213.me/WIDERFACE/WiderFace_Results.html) face detector which is initially introduced in [arXiv technical report](https://arxiv.org/abs/1905.00641) and then accepted by [CVPR 2020](https://openaccess.thecvf.com/content_CVPR_2020/html/Deng_RetinaFace_Single-Shot_Multi-Level_Face_Localisation_in_the_Wild_CVPR_2020_paper.html).
-
-![demoimg1](https://github.com/deepinsight/insightface/blob/master/resources/11513D05.jpg)
-
-![demoimg2](https://github.com/deepinsight/insightface/blob/master/resources/widerfacevaltest.png)
-
 ## Data
 
-1. Download our annotations (face bounding boxes & five facial landmarks) from [baidu cloud](https://pan.baidu.com/s/1Laby0EctfuJGgGMgRRgykA) or [dropbox](https://www.dropbox.com/s/7j70r3eeepe4r2g/retinaface_gt_v1.1.zip?dl=0)
+Download the [WIDERFACE](x) dataset.
 
-2. Download the [WIDERFACE](http://shuoyang1213.me/WIDERFACE/WiderFace_Results.html) dataset.
-
-3. Organise the dataset directory under ``insightface/RetinaFace/`` as follows:
+Organise the dataset directory under ``retinaFace/`` as follows:
 
 ```Shell
   data/retinaface/
@@ -28,12 +18,6 @@ RetinaFace is a practical single-stage [SOTA](http://shuoyang1213.me/WIDERFACE/W
       images/
       label.txt
 ```
-
-## Install
-
-1. Install MXNet with GPU support.
-2. Install Deformable Convolution V2 operator from [Deformable-ConvNets](https://github.com/msracver/Deformable-ConvNets) if you use the DCN based backbone.
-3. Type ``make`` to build cxx tools.
 
 ## Training
 

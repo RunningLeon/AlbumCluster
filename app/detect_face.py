@@ -1,8 +1,12 @@
+import os
 import cv2
+import sys
 
 import numpy as np
 
-from .retinaface import RetinaFace
+sys.path.append(os.path.join(os.path.dirname(__file__), '../src'))
+from retinaface import RetinaFace
+
 from .info import is_cuda_available
 
 
