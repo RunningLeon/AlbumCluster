@@ -15,10 +15,10 @@ from app.model_config import cfg
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Train RetinaFace')
     # general
-    parser.add_argument('--input',
+    parser.add_argument('-i', '--input',
                         help='Input video path',
                         type=str)
-    parser.add_argument('--output',
+    parser.add_argument('-o', '--output',
                         default='tmp.avi',
                         help='Output path to save video')
     parser.add_argument('-d', '--debug', action='store_true',
@@ -37,9 +37,8 @@ if __name__ == '__main__':
     detector = FaceDetector(cfg.MODEL_RETINAFACE)
         
     cap = cv2.VideoCapture(args.input)
-    fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    out = cv2.VideoWriter(args.output,fourcc, 20.0, (1280,960))
-
+    fourcc = cv2.VideoWriter_fourcc(*"mp4v")
+    out = cv2.VideoWriter(args.output, fourcc, 25,(640, 576))
     counter = 0
     end_idx = args.start_frame + args.max_num
     while(cap.isOpened() and counter < end_idx):
@@ -49,6 +48,7 @@ if __name__ == '__main__':
             if counter < args.start_frame:
                 continue
             # view_image(frame, name='original', wait_key=True)
+            # print(frame.shape)
             bboxes, landmarks = detector(frame)
             if bboxes is not None and bboxes.size:
                 for bb in bboxes:
@@ -58,7 +58,7 @@ if __name__ == '__main__':
                     frame = draw_landmark(frame, pts)
             if args.debug:
                 view_image(frame, 'retinaface', wait_key=True, win_width=1280, win_height=960)
-
+                time.sleep(1)
             # write the flipped frame
             frame = cv2.flip(frame,0)
             out.write(frame)
@@ -68,3 +68,4 @@ if __name__ == '__main__':
     cap.release()
     out.release()
     cv2.destroyAllWindows()
+    print(f'Saved to {args.output}')
